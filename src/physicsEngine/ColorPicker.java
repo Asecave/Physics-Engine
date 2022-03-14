@@ -3,20 +3,18 @@ package physicsEngine;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import ACInput.Listener.Button;
-
 public class ColorPicker {
 	
 	MouseClickBox boxes[] = new MouseClickBox[13];
 	
 	Button button;
 	
-	public ColorPicker(Button button, int posX, int posY) {
+	public ColorPicker(Button button, int posX, int posY, Simulation simulation) {
 		this.button = button;
 		
 		for (int i = 0; i < boxes.length; i++) {
 			boxes[i] = 
-					new MouseClickBox(button, posX, posY, 4, 4);
+					new MouseClickBox(button, posX, posY, 4, 4, simulation);
 			boxes[i].fill = true;
 			boxes[i].posX += i * 6;
 			switch (i) {

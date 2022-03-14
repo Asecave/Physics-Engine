@@ -3,16 +3,14 @@ package physicsEngine;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import ACInput.Listener.Button;
-
 public class TextMouseClickBox extends MouseClickBox {
 	
 	String textContent = "";
 	
 	private Color textColor = Color.WHITE;
 
-	public TextMouseClickBox(Button mouseButton, int posX, int posY) {
-		super(mouseButton, posX, posY, 3, 8);
+	public TextMouseClickBox(Button mouseButton, int posX, int posY, Simulation simulation) {
+		super(mouseButton, posX, posY, 3, 8, simulation);
 	}
 	
 	public void setTextContent(String text) {

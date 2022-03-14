@@ -4,9 +4,15 @@ import java.awt.Graphics2D;
 
 public class Circle extends Shape {
 
+	private Simulation simulation;
+	
 	int r = 10;
 	
 	private boolean fillCircle = false;
+	
+	public Circle(Simulation simulation) {
+		this.simulation = simulation;
+	}
 	
 	/**
 	 * Sets the radius of this circle.
@@ -26,16 +32,16 @@ public class Circle extends Shape {
 	@Override
 	void tick() {
 		if (isWallCollision()) {
-			if (posX + r > Simulation.width) {
-				posX = Simulation.width - r;
+			if (posX + r > simulation.getWidth()) {
+				posX = simulation.getWidth() - r;
 				velocityX = velocityX * -0.8f;
 			}
 			if (posX - r < 0) {
 				posX = r;
 				velocityX = velocityX * -0.8f;
 			}
-			if (posY + r > Simulation.height) {
-				posY = Simulation.height - r;
+			if (posY + r > simulation.getHeight()) {
+				posY = simulation.getHeight() - r;
 				velocityY = velocityY * -0.8f;
 			}
 			if (posY - r < 0) {
@@ -43,17 +49,17 @@ public class Circle extends Shape {
 				velocityY = velocityY * -0.8f;
 			}
 		}else {
-			if (posX > Simulation.width) {
+			if (posX > simulation.getWidth()) {
 				posX = 0;
 			}
 			if (posX < 0) {
-				posX = Simulation.width;
+				posX = simulation.getWidth();
 			}
-			if (posY > Simulation.height) {
+			if (posY > simulation.getHeight()) {
 				posY = 0;
 			}
 			if (posY < 0) {
-				posY = Simulation.height;
+				posY = simulation.getHeight();
 			}
 		}
 	}

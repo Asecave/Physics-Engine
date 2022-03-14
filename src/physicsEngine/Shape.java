@@ -14,8 +14,8 @@ public abstract class Shape {
 		static Color color = Color.WHITE;
 	}
 
-	public float posX = Simulation.default_positions.width;
-	public float posY = Simulation.default_positions.height;
+	public float posX = Simulation.default_positions.x;
+	public float posY = Simulation.default_positions.y;
 
 	public float velocityX = 0f;
 	public float velocityY = 0f;
@@ -152,14 +152,14 @@ public abstract class Shape {
 		return fixed;
 	}
 
-	void calculateVelocity(int updates) {
+	void calculateVelocity(int updates, Simulation simulation) {
 
 		if (gravity && !fixed) {
-			velocityX -= (velocityX * Simulation.friction) / updates;
-			velocityY -= ((velocityY * Simulation.friction) - Simulation.gravityFactor) / updates;
+			velocityX -= (velocityX * simulation.getFriction()) / updates;
+			velocityY -= ((velocityY * simulation.getFriction()) - simulation.getGravityFactor()) / updates;
 		} else {
-			velocityX -= (velocityX * Simulation.friction) / updates;
-			velocityY -= (velocityY * Simulation.friction) / updates;
+			velocityX -= (velocityX * simulation.getFriction()) / updates;
+			velocityY -= (velocityY * simulation.getFriction()) / updates;
 		}
 
 		mass = mass();
@@ -170,8 +170,8 @@ public abstract class Shape {
 		if (velocityX > 300f || velocityY > 300f) {
 			velocityX = 0;
 			velocityY = 0;
-			posX = (float) (Math.random() * Simulation.width);
-			posY = (float) (Math.random() * Simulation.height);
+			posX = (float) (Math.random() * simulation.getWidth());
+			posY = (float) (Math.random() * simulation.getHeight());
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 import physicsEngine.Circle;
 import physicsEngine.Line;
+import physicsEngine.Simulation;
 
 public class CircleLine extends Collision {
 
@@ -15,7 +16,7 @@ public class CircleLine extends Collision {
 	
 	CircleCircle cc;
 
-	public CircleLine(Circle c, Line l) {
+	public CircleLine(Circle c, Line l, Simulation simulation) {
 
 		float fLineX1 = l.x2 - l.posX;
 		float fLineY1 = l.y2 - l.posY;
@@ -35,7 +36,7 @@ public class CircleLine extends Collision {
 
 		if (distance <= (c.getRadius() + l.getRadius())) {
 
-			Circle fake = new Circle();
+			Circle fake = new Circle(simulation);
 			fake.setRadius(l.getRadius());
 			fake.mass = c.mass * 0.8f;
 			fake.posX = fClosestPointX;

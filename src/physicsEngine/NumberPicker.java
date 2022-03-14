@@ -3,15 +3,13 @@ package physicsEngine;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import ACInput.Listener.Button;
-
 public class NumberPicker {
 
 	TextMouseClickBox[] boxes;
 	
 	Button button;
 
-	public NumberPicker(Button button, int posX, int posY, int from, int to) {
+	public NumberPicker(Button button, int posX, int posY, int from, int to, Simulation simulation) {
 
 		this.button = button;
 		
@@ -25,7 +23,7 @@ public class NumberPicker {
 		int x = 0;
 		
 		for (int i = 0; i < boxes.length; i++) {
-			boxes[i] = new TextMouseClickBox(button, posX, posY);
+			boxes[i] = new TextMouseClickBox(button, posX, posY, simulation);
 			boxes[i].setTextContent("" + (i + from));
 			boxes[i].posX += i + x;
 			x += boxes[i].getBoxWidth();

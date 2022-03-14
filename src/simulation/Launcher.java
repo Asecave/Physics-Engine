@@ -1,13 +1,15 @@
 package simulation;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 
-import ACInput.Listener;
 import physicsEngine.Circle;
 import physicsEngine.Line;
 import physicsEngine.Simulation;
 
 public class Launcher extends Simulation {
+
+	private static final long serialVersionUID = 1L;
 
 	public Launcher() {
 
@@ -19,7 +21,7 @@ public class Launcher extends Simulation {
 		this.setEditable(true);
 
 		for (int i = 0; i < 30; i++) {
-			Circle c = new Circle();
+			Circle c = new Circle(this);
 			c.setRadius((int)(Math.random() * 10) + 2);
 			c.setGravity(true);
 			c.setCollidable(true);
@@ -30,7 +32,7 @@ public class Launcher extends Simulation {
 			addShapes(c);
 		}
 		
-		Circle c = new Circle();
+		Circle c = new Circle(this);
 		c.setRadius((int)(Math.random() * 10) + 2);
 		c.setGravity(false);
 		c.setCollidable(true);
@@ -43,7 +45,12 @@ public class Launcher extends Simulation {
 
 	@Override
 	public void loop() {
-		if (Listener.getKey(Listener.VK_SPACE).isPressed()) {
+		
+	}
+	
+	@Override
+	public void onKeyEvent(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			Line l = new Line();
 			l.setGravity(false);
 			l.setFixed(true);
@@ -52,8 +59,8 @@ public class Launcher extends Simulation {
 			
 			addShapes(l);
 		}
-		if (Listener.getKey(Listener.VK_ENTER).isPressed()) {
-			Circle c = new Circle();
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			Circle c = new Circle(this);
 			c.setRadius(10);
 			c.setFixed(true);
 			c.setEditable(false);

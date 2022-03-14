@@ -3,9 +3,10 @@ package physicsEngine;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import ACInput.Listener.Button;
-
 public class MouseClickBox extends Letters {
+	
+	private Simulation simulation;
+	
 	int posX, posY, width, height;
 	
 	private Color color = Color.WHITE;
@@ -14,20 +15,20 @@ public class MouseClickBox extends Letters {
 	
 	public boolean fill = false;
 
-	public MouseClickBox(Button mouseButton, int posX, int posY, int width, int height) {
+	public MouseClickBox(Button mouseButton, int posX, int posY, int width, int height, Simulation simulation) {
 		this.posX = posX;
 		this.posY = posY;
 		this.width = width;
 		this.height = height;
 		this.mouseButton = mouseButton;
-		
+		this.simulation = simulation;
 	}
 	
 	public boolean isClicked() {
 		if (mouseButton != null) {
 			if (mouseButton.isPressed()) {
-				if (Simulation.mousePosition.x * Simulation.pixelSize / EditMenu.scale >= posX && Simulation.mousePosition.x * Simulation.pixelSize / EditMenu.scale <= posX + width
-						&& Simulation.mousePosition.y * Simulation.pixelSize / EditMenu.scale >= posY && Simulation.mousePosition.y * Simulation.pixelSize / EditMenu.scale <= posY + height)
+				if (simulation.getMousePosition().x * simulation.getPixelSize() / EditMenu.scale >= posX && simulation.getMousePosition().x * simulation.getPixelSize() / EditMenu.scale <= posX + width
+						&& simulation.getMousePosition().y * simulation.getPixelSize() / EditMenu.scale >= posY && simulation.getMousePosition().y * simulation.getPixelSize() / EditMenu.scale <= posY + height)
 					return true;
 			}
 		}
@@ -37,8 +38,8 @@ public class MouseClickBox extends Letters {
 	public boolean isHeld() {
 		if (mouseButton != null) {
 			if (mouseButton.isHeld()) {
-				if (Simulation.mousePosition.x * Simulation.pixelSize / EditMenu.scale >= posX && Simulation.mousePosition.x * Simulation.pixelSize / EditMenu.scale <= posX + width
-						&& Simulation.mousePosition.y * Simulation.pixelSize / EditMenu.scale >= posY && Simulation.mousePosition.y * Simulation.pixelSize / EditMenu.scale <= posY + height)
+				if (simulation.getMousePosition().x * simulation.getPixelSize() / EditMenu.scale >= posX && simulation.getMousePosition().x * simulation.getPixelSize() / EditMenu.scale <= posX + width
+						&& simulation.getMousePosition().y * simulation.getPixelSize() / EditMenu.scale >= posY && simulation.getMousePosition().y * simulation.getPixelSize() / EditMenu.scale <= posY + height)
 					return true;
 			}
 		}
@@ -48,9 +49,9 @@ public class MouseClickBox extends Letters {
 	public boolean isReleased() {
 		if (mouseButton != null) {
 			if (mouseButton.isReleased()) {
-				if (Simulation.mousePosition.x * Simulation.pixelSize / EditMenu.scale >= posX && Simulation.mousePosition.x * Simulation.pixelSize / EditMenu.scale <= posX + width
-						&& Simulation.mousePosition.y * Simulation.pixelSize / EditMenu.scale >= posY
-						&& Simulation.mousePosition.y * Simulation.pixelSize / EditMenu.scale <= posY + height)
+				if (simulation.getMousePosition().x * simulation.getPixelSize() / EditMenu.scale >= posX && simulation.getMousePosition().x * simulation.getPixelSize() / EditMenu.scale <= posX + width
+						&& simulation.getMousePosition().y * simulation.getPixelSize() / EditMenu.scale >= posY
+						&& simulation.getMousePosition().y * simulation.getPixelSize() / EditMenu.scale <= posY + height)
 					return true;
 			}
 		}

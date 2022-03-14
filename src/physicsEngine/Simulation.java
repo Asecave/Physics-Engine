@@ -2,43 +2,54 @@ package physicsEngine;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
-import ACInput.Listener;
-import ACWindow.Frame;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 
-public class Simulation {
+public class Simulation extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
+
+	private static final long serialVersionUID = 1L;
 
 	private ShapeEnvironment se;
 
 	private EditMenu edit;
+	
+	private JFrame frame;
 
-	static int width, height;
+	private int width, height;
 
-	static Dimension default_positions;
+	static Point default_positions;
 
-	static boolean debugMode = false;
+	private boolean debugMode = false;
 
-	static float gravityFactor = 0.1f;
+	private float gravityFactor = 0.1f;
 
-	static float friction = 0.015f;
+	private float friction = 0.015f;
 
-	static int simulationUpdates = 10;
+	private int simulationUpdates = 10;
 
-	static Point mousePosition = new Point();
+	private Point mousePosition = new Point();
 
-	static boolean editable = false;
+	private boolean editable = false;
 
-	static Color backgroundColor = Color.BLACK;
+	private Color backgroundColor = Color.BLACK;
 
-	static Color menuColor = Color.WHITE;
+	private Color menuColor = Color.WHITE;
 
-	static int pixelSize = 1;
+	private int pixelSize = 1;
 
-	static int thickness = 1;
+	private int thickness = 1;
+	
+	private boolean running;
 
 	/**
 	 * Returns the current size (width and height) of the simulated pixels.
@@ -51,9 +62,9 @@ public class Simulation {
 	 * Sets a new pixel size of the simulated pixels. Increasing makes the play-area smaller.
 	 */
 	public void setPixelSize(int pixelSize) {
-		width = Simulation.pixelSize * width / pixelSize;
-		height = Simulation.pixelSize * height / pixelSize;
-		Simulation.pixelSize = pixelSize;
+		width = pixelSize * width / pixelSize;
+		height = pixelSize * height / pixelSize;
+		this.pixelSize = pixelSize;
 		se.changeImage(width, height);
 		edit.changeImage();
 	}
@@ -90,7 +101,7 @@ public class Simulation {
 	 * Sets a new edit menu color. If the edit-menu is disabled, this method won't affect anything.
 	 */
 	public void setMenuColor(Color menuColor) {
-		Simulation.menuColor = menuColor;
+		this.menuColor = menuColor;
 	}
 
 	/**
@@ -104,7 +115,7 @@ public class Simulation {
 	 * Setting this option to false disables the edit-menu.
 	 */
 	public void setEditable(boolean editable) {
-		Simulation.editable = editable;
+		this.editable = editable;
 	}
 
 	/**
@@ -124,7 +135,7 @@ public class Simulation {
 	 * calculations, so this may slows the simulation down.
 	 */
 	public void setSimulationUpdates(int simulationUpdates) {
-		Simulation.simulationUpdates = simulationUpdates;
+		this.simulationUpdates = simulationUpdates;
 	}
 
 	/**
@@ -153,7 +164,7 @@ public class Simulation {
 	 * The gravity factor is set to 0.1 in default;
 	 */
 	public void setGravityFactor(float gravity) {
-		Simulation.gravityFactor = gravity;
+		this.gravityFactor = gravity;
 	}
 
 	/**
@@ -175,7 +186,7 @@ public class Simulation {
 	 * The thickness is just a display option. It will not affect the shapes.
 	 */
 	public void setThickness(int thickness) {
-		Simulation.thickness = thickness;
+		this.thickness = thickness;
 		se.setStroke(new BasicStroke(thickness));
 	}
 
@@ -235,7 +246,7 @@ public class Simulation {
 	 * The background-friction is set to 0.015 in default.
 	 */
 	public void setFriction(float friction) {
-		Simulation.friction = friction;
+		this.friction = friction;
 	}
 	
 	/**
@@ -256,50 +267,146 @@ public class Simulation {
 
 	public Simulation(int width, int height, int pixelSize, int fps) {
 
-		Simulation.pixelSize = pixelSize;
-		Simulation.width = width / pixelSize;
-		Simulation.height = height / pixelSize;
-		default_positions = new Dimension((width / pixelSize) / 2, (height / pixelSize) / 2);
+		this.pixelSize = pixelSize;
+		this.width = width / pixelSize;
+		this.height = height / pixelSize;
+		default_positions = new Point((width / pixelSize) / 2, (height / pixelSize) / 2);
 
-		se = new ShapeEnvironment(width / pixelSize, height / pixelSize);
+		se = new ShapeEnvironment(width / pixelSize, height / pixelSize, this);
 
-		edit = new EditMenu();
-
-		Frame frame = new Frame(width, height, fps) {
-			@Override
-			public void frameLoop(Graphics2D g2d) {
-				mousePosition.x = mouseOnWindow.x / Simulation.pixelSize;
-				mousePosition.y = mouseOnWindow.y / Simulation.pixelSize;
-				loop();
-				loop(g2d);
-				se.tick(edit);
-				edit.repaint();
-				g2d.drawImage(se.getImage(), 0, 0, width, height, null);
-				g2d.drawImage(edit.render(getSimulation()), 0, 0, width, height, null);
-				se.repaint();
+		edit = new EditMenu(this);
+		
+		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setSize(width, height);
+		frame.add(this);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		this.addKeyListener(this);
+		this.addMouseMotionListener(this);
+		this.addMouseListener(this);
+		
+		new Thread(() -> {
+			running = true;
+			while (running) {
+				long startTime = System.currentTimeMillis();
+				
+				repaint();
+				
+				long timeTaken = System.currentTimeMillis() - startTime;
+				try {
+					Thread.sleep(Math.max(0, 10 - timeTaken));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
 			}
+		}).start();
 
-			@Override
-			public void titleUpdate() {
-				setAdditionalTitle(ShapeEnvironment.shapes.length + " Objects");
-			}
-		};
-
-		frame.setShowInfoInTitle(true);
-
-		Listener listener = new Listener(frame);
-
-		frame.addListener(listener);
+//		Frame frame = new Frame(width, height, fps) {
+//			/**
+//			 * 
+//			 */
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public void frameLoop(Graphics2D g2d) {
+//				mousePosition.x = mouseOnWindow.x / Simulation.pixelSize;
+//				mousePosition.y = mouseOnWindow.y / Simulation.pixelSize;
+//				loop();
+//				loop(g2d);
+//				se.tick(edit);
+//				edit.repaint();
+//				g2d.drawImage(se.getImage(), 0, 0, width, height, null);
+//				g2d.drawImage(edit.render(getSimulation()), 0, 0, width, height, null);
+//				se.repaint();
+//			}
+//
+//			@Override
+//			public void titleUpdate() {
+//				setAdditionalTitle(ShapeEnvironment.shapes.length + " Objects");
+//			}
+//		};
 
 	}
-
-	private Simulation getSimulation() {
-		return this;
+	
+	@Override
+	protected void paintComponent(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		
+		g2d.drawRect(300, 0, 100, 100);
+		
+//		loop();
+//		se.tick(edit);
+//		edit.repaint();
+//		g2d.drawImage(se.getImage(), 0, 0, super.getWidth(), super.getHeight(), null);
+//		g2d.drawImage(edit.render(this), 0, 0, super.getWidth(), super.getHeight(), null);
+//		se.repaint();
+//		
+//		Button.left.update();
+//		Button.right.update();
+	}
+	
+	public void loop() {}
+	
+	public void onKeyEvent(KeyEvent e) {}
+	
+	public void onMouseEvent(MouseEvent e) {}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		
 	}
 
-	public void loop() {
+	@Override
+	public void keyPressed(KeyEvent e) {
+		se.keyPressed(e);
+		onKeyEvent(e);
 	}
 
-	public void loop(Graphics2D g2d) {
+	@Override
+	public void keyReleased(KeyEvent e) {
+		onKeyEvent(e);
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		mousePosition = e.getPoint();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		se.mousePressed(e, edit);
+		Button.left.mousePressed(e);
+		Button.right.mousePressed(e);
+		onMouseEvent(e);
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		se.mouseReleased(e);
+		Button.left.mouseReleased(e);
+		Button.right.mouseReleased(e);
+		onMouseEvent(e);
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		
 	}
 }
